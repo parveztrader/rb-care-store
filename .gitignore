@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.env
+.env.local
+coverage/
+.data/
+wordpress/.runtime/
+wordpress/.staging/
+wordpress/migration/
+tsconfig.tsbuildinfo

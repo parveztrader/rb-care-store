@@ -1,0 +1,3 @@
+import { z } from "zod";
+export const checkoutSchema=z.object({ productSlug:z.string().min(1), name:z.string().min(2), phone:z.string().regex(/^[6-9]\d{9}$/,"Enter a valid 10-digit Indian mobile number"), email:z.string().email(), address:z.string().min(12), city:z.enum(["Lucknow","Mumbai","Pune","Gonda"]), pincode:z.string().regex(/^\d{6}$/) });
+export const bulkSchema=z.object({ name:z.string().min(2), phone:z.string().regex(/^[6-9]\d{9}$/), organisation:z.string().min(2), city:z.enum(["Lucknow","Mumbai","Pune","Gonda"]), quantity:z.coerce.number().int().min(2), categories:z.string().min(3), budget:z.coerce.number().positive(), deliveryNeed:z.string().min(3) });
