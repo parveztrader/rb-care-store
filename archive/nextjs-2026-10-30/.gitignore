@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.env
+.env.local
+coverage/
+.data/
+wordpress/.runtime/
+wordpress/.staging/
+wordpress/migration/private/
+wordpress/dev/.env
+wordpress/dev/private/
+wordpress/dev/reports/
+wordpress/dev/downloads/
+wordpress/releases/
+tsconfig.tsbuildinfo

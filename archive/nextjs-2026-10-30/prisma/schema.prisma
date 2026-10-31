@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum StockMode {
+  CITY
+  CENTRAL
+}
+
+enum InventoryStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+}
+
+model Product {
+  id             String          @id @default(cuid())
+  sku            String          @unique
+  slug           String          @unique
+  name           String
+  category       String
+  city           String
+  stockMode      StockMode       @default(CITY)
+  condition      String
+  price          Int
+  deliveryCharge Int
+  warrantyDays   Int
+  status         InventoryStatus @default(AVAILABLE)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  orders         Order[]
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  externalId    String   @unique
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id])
+  name          String
+  phone         String
+  email         String
+  address       String
+  city          String
+  pincode       String
+  amount        Int
+  paymentStatus String   @default("PENDING")
+  createdAt     DateTime @default(now())
+}
+
+model BulkEnquiry {
+  id           String   @id @default(cuid())
+  name         String
+  phone        String
+  organisation String
+  city         String
+  quantity     Int
+  categories   String
+  budget       Int
+  deliveryNeed String
+  status       String   @default("NEW")
+  createdAt    DateTime @default(now())
+}

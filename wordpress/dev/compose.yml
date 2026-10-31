@@ -1,0 +1,72 @@
+name: rb-care
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: rbcare
+      MARIADB_USER: rbcare
+      MARIADB_PASSWORD: ${DB_PASSWORD:?Run start.ps1 first}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Run start.ps1 first}
+    volumes:
+      - database:/var/lib/mysql
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks: [store]
+  web:
+    image: wordpress:php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 127.0.0.1:8096:80
+    environment: &wp-environment
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: rbcare
+      WORDPRESS_DB_USER: rbcare
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DEBUG: '1'
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_ENVIRONMENT_TYPE', 'local');
+        define('RBCARE_LOCAL', true);
+        define('RBCARE_PRIVATE_DIR', '/var/www/rbcare-private');
+        define('WP_HOME', 'http://localhost:8096');
+        define('WP_SITEURL', 'http://localhost:8096');
+        define('DISALLOW_FILE_EDIT', true);
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', false);
+        define('WP_AUTO_UPDATE_CORE', false);
+        define('WP_HTTP_BLOCK_EXTERNAL', true);
+        define('WP_ACCESSIBLE_HOSTS', 'localhost,127.0.0.1,api.wordpress.org,downloads.wordpress.org,*.wordpress.org');
+    volumes: &wp-volumes
+      - website:/var/www/html
+      - private-data:/var/www/rbcare-private
+      - ../wp-content/themes/rb-care:/var/www/html/wp-content/themes/rb-care
+      - ../wp-content/plugins/rb-care-commerce:/var/www/html/wp-content/plugins/rb-care-commerce
+      - ./local-guard.php:/var/www/html/wp-content/mu-plugins/rbcare-local-guard.php:ro
+      - ./uploads.ini:/usr/local/etc/php/conf.d/rbcare-uploads.ini:ro
+      - ../:/project:ro
+    networks: [store, preview]
+  cli:
+    image: wordpress:cli-php8.3
+    entrypoint: [wp]
+    profiles: [tools]
+    user: '33:33'
+    environment:
+      <<: *wp-environment
+      HOME: /tmp
+      RB_ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    volumes: *wp-volumes
+    networks: [store, preview]
+volumes:
+  database:
+  website:
+  private-data:
+networks:
+  store:
+    internal: true
+  preview:

@@ -1,0 +1,40 @@
+
+import { Localized } from "@/components/Localization";
+import Link from "next/link";
+import { formatINR } from "@/lib/catalog";
+import { getProducts } from "@/lib/inventory";
+import { SiteChrome } from "@/components/SiteChrome";
+import { ProductCard } from "@/components/ProductCard";
+const categories = ["Washing Machine", "Refrigerator", "Air Conditioner", "Microwave"];
+const categoryNames: Record<string, string> = {
+ "Washing Machine": "2nd hand washing machine",
+ "Refrigerator": "2nd hand fridge",
+ "Air Conditioner": "Used AC",
+ "Microwave": "Used microwave",
+};
+const aboutText = "RB Care Service helps families in Lucknow, Gonda and nearby towns find second-hand home appliances. Browse used washing machines, fridges, air conditioners and microwaves, with clear information about condition, age, price and warranty. Refurbished means a previously used appliance has been checked and repaired where necessary before resale. Compare options for your home, rented room, shop or office. Check product details carefully and ask about any marks or repairs before buying. Need help choosing? Call our team for guidance. Share your town and PIN code to confirm delivery availability, installation requirements and the total charges before placing your order online.";
+const buyingQuestions = [
+ { question: "Is this appliance new or used?", answer: "This is a previously used, second-hand appliance. Refurbished means it has been checked and repaired where needed for resale. Ask about its condition and repair history before buying." },
+ { question: "Will a used fridge or washing machine have marks?", answer: "Used appliances may have scratches or signs of wear. Check each product's condition and photos, and call us if anything is unclear." },
+ { question: "How much warranty is included?", answer: "Check the warranty for each appliance. Read the period and policy on the product page, and understand which parts and faults are covered before paying." },
+ { question: "Is delivery available in Gonda or my town?", answer: "In Lucknow, Gonda or a nearby town? Share your town and PIN code to confirm delivery availability, charges and installation. Delivery may not be available everywhere." },
+];
+export default function Home() {
+ const products = getProducts().filter(p=>p.status === "AVAILABLE");
+ return <Localized><SiteChrome><main className="shell store-home">
+  <div className="store-intro"><aside className="category-menu"><h2>Shop by category</h2>{categories.map(c=><Link href={`/products?category=${encodeURIComponent(c)}`} key={c}>{c}<span>›</span></Link>)}<Link href="/products">View all appliances<span>›</span></Link></aside>
+  <section className="store-banner"><div><p className="banner-kicker">LUCKNOW · GONDA · NEARBY TOWNS</p><h1>Second-hand washing machines,<br/>fridges and ACs within your budget.</h1><p>Looking for a used appliance for your home? Browse washing machines, fridges, ACs and microwaves at RB Care.</p><Link className="btn btn-teal" href="/products">Browse appliances and prices</Link><a className="banner-help-link" href="#samjhein">What does refurbished mean? ↓</a></div><div className="banner-note"><strong>Buying second-hand for the first time?</strong><p>Understand the condition, warranty and delivery charges before buying. Call us for help.</p><a href="tel:+918503939715">Call 08503939715 ›</a></div></section></div>
+  <div className="store-benefits"><div><strong>Clear condition details</strong><span>Know the appliance&apos;s condition</span></div><div><strong>Check the warranty</strong><span>Read each product&apos;s coverage</span></div><div><strong>Check delivery availability</strong><span>Share your town&apos;s PIN code</span></div><div><strong>Need help choosing?</strong><a href="tel:+918503939715">Call 08503939715</a></div></div>
+  <section className="home-sell-callout"><div><p className="banner-kicker">BUY AND SELL APPLIANCES</p><h2>Want to sell your old appliance?</h2><p>Submit photos and condition details of your washing machine, fridge, AC or microwave. Your request stays pending until the RB Care team reviews and prices it. Publication requires separate team approval.</p></div><div><Link className="btn btn-teal" href="/sell">Sell your appliance →</Link><Link href="/community">Browse customer appliances ›</Link></div></section>
+  <section className="buyer-guide" id="samjhein" aria-labelledby="meaning-title"><div className="store-section-heading"><h2 id="meaning-title">Second-hand, used and refurbished — explained</h2></div><p className="guide-intro">Understand the basics, then choose an appliance that fits your budget.</p><div className="explanation-grid"><article><span className="guide-label">2nd hand / Used</span><h3>Previously used by another owner</h3><p>An appliance previously used in another home, such as a washing machine or fridge. It is also called used or second-hand.</p></article><article><span className="guide-label">Refurbished</span><h3>Checked and prepared for resale</h3><p>A previously used appliance that has been checked and repaired where needed. Ask about the working condition of each individual unit.</p></article><article><span className="guide-label">Before you buy</span><h3>Check the details as well as the price</h3><p>Ask about age, scratches, working condition and warranty. Refurbished appliances are not new and may show signs of previous use.</p></article></div></section>
+  <section className="stock-section"><div className="store-section-heading"><h2>Available second-hand appliances</h2><Link href="/products">View all products ›</Link></div><div className="lg-card-grid">{products.map(p=><ProductCard key={p.id} product={p}/>)}</div></section>
+  <section className="category-directory"><div className="store-section-heading"><h2>Shop by appliance type</h2></div><div className="category-directory-grid">{categories.map(c=>{const list=products.filter(p=>p.category===c);return <Localized key={c}><Link href={`/products?category=${encodeURIComponent(c)}`}><h3>{categoryNames[c]}</h3><p>{list.length} {list.length===1?"appliance":"appliances"} available</p><strong>{list.length ? `${formatINR(Math.min(...list.map(p=>p.price)))} se shuru` : "Enquire about stock"}</strong></Link></Localized>;})}</div></section>
+  <section className="buyer-guide" aria-labelledby="steps-title"><div className="store-section-heading"><h2 id="steps-title">How to buy in 3 simple steps</h2></div><ol className="buying-steps"><li><span className="step-number" aria-hidden="true">1</span><div><h3>Choose your appliance</h3><p>Browse second-hand washing machines, fridges, ACs and microwaves. Compare prices with your household needs and budget.</p></div></li><li><span className="step-number" aria-hidden="true">2</span><div><h3>Confirm the details by phone</h3><p>Ask about the model, condition and warranty. Share your PIN code to confirm the total delivery and installation charges.</p></div></li><li><span className="step-number" aria-hidden="true">3</span><div><h3>Place your order</h3><p>Once you understand the details, add the appliance to your cart and review your order at checkout.</p></div></li></ol><div className="local-help"><div><h3>Need help online? Talk to us by phone.</h3><p>Share your town and PIN code for Lucknow, Gonda and nearby areas.</p></div><a className="btn btn-teal" href="tel:+918503939715">Call us: 08503939715</a></div></section>
+  <section className="buyer-guide local-questions" aria-labelledby="questions-title"><div className="store-section-heading"><h2 id="questions-title">Your questions answered</h2></div>{buyingQuestions.map(item=><details key={item.question}><summary>{item.question}</summary><p>{item.answer}</p></details>)}</section>
+  <section className="store-about" id="why"><div><h2>About RB Care Service</h2><p>{aboutText}</p></div><div><h3>Buying for a shop, office or rental home?</h3><p>Need multiple appliances? Tell us your requirements and budget.</p><Link href="/bulk">Send a bulk enquiry ›</Link></div></section>
+ </main></SiteChrome></Localized>;
+}
+
+
+
+

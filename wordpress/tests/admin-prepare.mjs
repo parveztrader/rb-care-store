@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {fileURLToPath} from 'node:url';
+import {spawnSync} from 'node:child_process';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const previousFile=path.join(root,'dev/private/admin-fixture.json');if(fs.existsSync(previousFile)&&!JSON.parse(fs.readFileSync(previousFile,'utf8')).finished)throw Error('Complete or clean up the existing backend QA fixtures before creating another run.');
+const fixture={run:crypto.randomUUID(),customerUser:'rbqa_'+crypto.randomBytes(5).toString('hex'),customerPassword:crypto.randomBytes(24).toString('hex')};
+const form=new FormData();
+for(const [key,value]of Object.entries({category:'Washing Machine',brand:'RBADMINQA',model:'Admin workflow fixture',capacity:'7 kg',age:'1–3 years',condition:'Working well',description:'Temporary backend QA fixture with cosmetic marks.',repairs:'None declared.',name:'RB Admin QA Customer',phone:'9765432189',city:'Lucknow',area:'QA locality',pincode:'226001',publishConsent:'1',contactConsent:'1'}))form.set(key,value);
+form.append('photos[]',new Blob([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64')],{type:'image/png'}),'qa.png');
+let response=await fetch('http://localhost:8096/wp-json/rb-care/v1/sell',{method:'POST',body:form});let result=await response.json();if(response.status!==201)throw Error(result.message);Object.assign(fixture,{id:result.id,token:result.token});
+const enquiry=new FormData();for(const[key,value]of Object.entries({kind:'contact',name:'RB Admin QA Customer',phone:'9765432189',city:'Lucknow',message:'Temporary contact enquiry for backend QA.',contactConsent:'1'}))enquiry.set(key,value);
+response=await fetch('http://localhost:8096/wp-json/rb-care/v1/enquiry',{method:'POST',body:enquiry});result=await response.json();if(response.status!==201)throw Error(result.message);fixture.enquiryId=Number(result.reference.slice(4));
+const filename=path.join(root,'dev/private/admin-fixture.json');fs.writeFileSync(filename,JSON.stringify(fixture,null,2));
+const prepared=spawnSync('docker',['compose','run','--rm','cli','eval-file','/project/tests/admin-fixtures.php'],{cwd:path.join(root,'dev'),encoding:'utf8',timeout:120000});
+if(prepared.status!==0)throw Error(prepared.stderr);const record=JSON.parse(prepared.stdout.trim().split('\n').find(line=>line.startsWith('{')));Object.assign(fixture,record);fs.writeFileSync(filename,JSON.stringify(fixture,null,2));console.log(JSON.stringify(record));

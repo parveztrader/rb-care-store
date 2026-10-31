@@ -1,0 +1,35 @@
+{
+  "name": "rb-care-refurbished",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:local": "next dev --hostname 127.0.0.1 --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "wp:start": "powershell -NoProfile -ExecutionPolicy Bypass -File wordpress/dev/start.ps1",
+    "wp:stop": "powershell -NoProfile -ExecutionPolicy Bypass -File wordpress/dev/stop.ps1",
+    "wp:test": "node wordpress/tests/http.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.1.0",
+    "next": "^15.1.0",
+    "razorpay": "^2.9.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^15.5.21",
+    "prisma": "^6.1.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
